@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jenkins</title>
+</head>
+<body>
+
+En una ecuacion de segundo grado cx<sup>2</sup> + bx + a<br>
+<label for="a">Coeficiente a</label>
+<input type="number" id="a"><br>
+<label for="b">Coeficiente b</label>
+<input type="number" id="b"><br>
+<label for="c">Coeficiente c</label>
+<input type="number" id="c"><br>
+<input type="button" id="boton" value="Enviar"><br>
+
+<script type="text/javascript">
+
+    var coefa = document.getElementById("a");
+    var coefb = document.getElementById("b");
+    var coefc = document.getElementById("c");
+
+    var boton = document.getElementById("boton");
+
+    boton.addEventListener("click", insertartabla);
+
+    var xhreq = new XMLHttpRequest();
+
+    var coeficientes = {
+    }
+
+    function insertartabla(event) {
+        coeficientes["coeficientea"] = coefa.value;
+        coeficientes["coeficienteb"] = coefb.value;
+        coeficientes["coeficientec"] = coefc.value;
+        coeficientes["cont"] = "insertartab"
+
+        xhreq.open("POST", "Ecuacionsegundogrado.php", true);
+        xhreq.onreadystatechange = recibirtabla;
+        xhreq.send(JSON.stringify(coeficientes));
+    }
+
+    function recibirtabla() {
+        if ((xhreq.readyState == 4) && (xhreq.status == 200)) {
+            let result = JSON.parse(xhreq.responseText);
+
+            var tabla = document.createElement("table");
+            tabla.setAttribute("border", "1px");
+            tabla.setAttribute("cellpadding", "10");
+            tabla.setAttribute("style", "border: 1px solid lightgray; border-collapse: collapse");
+            boton.parentElement.insertBefore(tabla,boton.nextSibling);
+
+            var fila = document.createElement("tr");
+            tabla.appendChild(fila);
+
+            var encabezados = ["x", "y"];
+            for (i = 0; i < encabezados.length; i++) {
+                var encabezado = document.createElement("th");
+                encabezado.innerHTML = encabezados[i];
+                fila.appendChild(encabezado);
+            }
+
+            for (i = 0; i < result.encabezadoscoef.length; i++){
+                var filacont = document.createElement("tr");
+                tabla.appendChild(filacont);
+
+                var contenidocoef = document.createElement("td");
+                contenidocoef.innerHTML = result.encabezadoscoef[i];
+                filacont.appendChild(contenidocoef);
+
+                var contenidotab = document.createElement("td");
+                contenidotab.innerHTML = result.resultadotab[i];
+                filacont.appendChild(contenidotab);
+            }
+        }
+    }
+
+</script>
+</body>
+</html>
